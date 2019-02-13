@@ -19,24 +19,26 @@ const auth = {
     }
     return requests.get('/auth/me').catch(error => {
       if (error.response.status === 401) {
-        logout()
+        _logout()
         return {user: null}
       }
       return Promise.reject(error)
     })
   },
   logout: () => {
-    logout()
+    // remove token
+    _logout()
     return Promise.resolve({user: null})
   },
   login: form =>
     requests.post('/auth/login', form).then(data => {
-      login({token: data.user.token})
+      // set token
+      _login({token: data.user.token})
       return data
     }),
   register: form =>
     requests.post('/auth/register', form).then(data => {
-      login({token: data.user.token})
+      _login({token: data.user.token})
       return data
     }),
 }
@@ -55,12 +57,12 @@ const posts = {
   create: post => requests.post('/posts', post),
 }
 
-function logout() {
+function _logout() {
   window.localStorage.removeItem('token')
   init({token: null})
 }
 
-function login({token}) {
+function _login({token}) {
   window.localStorage.setItem('token', token)
   init({token})
 }
